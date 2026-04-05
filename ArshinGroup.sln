@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37027.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArshinGroup.Domain", "ArshinGroup\ArshinGroup.Domain.csproj", "{B93B7754-6180-49C8-B21A-A0319058C00B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DATA", "DATA", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{A0152825-4BC1-4FA5-AE59-0CAD4B015505}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{9010C330-0E4D-47EB-9E9A-545FC1973F13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArshinGroup.DAL", "ArshinGroup.DAL\ArshinGroup.DAL.csproj", "{76922783-FA05-4331-8BBE-06387FE1A9DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B93B7754-6180-49C8-B21A-A0319058C00B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B93B7754-6180-49C8-B21A-A0319058C00B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B93B7754-6180-49C8-B21A-A0319058C00B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B93B7754-6180-49C8-B21A-A0319058C00B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76922783-FA05-4331-8BBE-06387FE1A9DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76922783-FA05-4331-8BBE-06387FE1A9DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76922783-FA05-4331-8BBE-06387FE1A9DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76922783-FA05-4331-8BBE-06387FE1A9DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B93B7754-6180-49C8-B21A-A0319058C00B} = {A0152825-4BC1-4FA5-AE59-0CAD4B015505}
+		{A0152825-4BC1-4FA5-AE59-0CAD4B015505} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{9010C330-0E4D-47EB-9E9A-545FC1973F13} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{76922783-FA05-4331-8BBE-06387FE1A9DE} = {9010C330-0E4D-47EB-9E9A-545FC1973F13}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94B9507B-83CC-4516-9DB2-F6DA890A0974}
+	EndGlobalSection
+EndGlobal
