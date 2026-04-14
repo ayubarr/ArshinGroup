@@ -1,0 +1,483 @@
+﻿/*
+/*
+  # Аршин Групп - Полная схема базы данных
+
+  ## Новые таблицы:
+
+  1. `site_settings` - Настройки сайта (логотип, телефон, адрес, email)
+  2. `navigation_menus` - Разделы основного меню верхнего уровня
+  3. `navigation_items` - Элементы подменю (привязаны к разделам меню)
+  4. `banners` - Баннеры/слайдеры на главной странице
+  5. `services` - Каталог услуг компании
+  6. `service_categories` - Категории услуг
+  7. `products` - Каталог продуктов/оборудования
+  8. `product_categories` - Категории продуктов
+  9. `news` - Новости и статьи
+  10. `contacts` - Контактная информация (офисы)
+  11. `admin_users` - Администраторы панели управления
+
+  ## Безопасность:
+  - RLS включен для всех таблиц
+  - Публичный доступ на чтение для контентных таблиц
+  - Запись только для авторизованных администраторов
+*/
+
+-- ============================================================
+-- SITE SETTINGS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key text UNIQUE NOT NULL,
+  value text,
+  value_json jsonb,
+  description text,
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read site settings"
+  ON site_settings FOR SELECT
+  TO anon, authenticated
+  USING (true);
+
+CREATE POLICY "Authenticated users can update site settings"
+  ON site_settings FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can insert site settings"
+  ON site_settings FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+-- ============================================================
+-- NAVIGATION MENUS (верхний уровень)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS navigation_menus (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  slug text UNIQUE NOT NULL,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE navigation_menus ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read navigation menus"
+  ON navigation_menus FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage navigation menus"
+  ON navigation_menus FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update navigation menus"
+  ON navigation_menus FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete navigation menus"
+  ON navigation_menus FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- NAVIGATION ITEMS (подменю - группы и ссылки)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS navigation_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  menu_id uuid REFERENCES navigation_menus(id) ON DELETE CASCADE,
+  parent_id uuid REFERENCES navigation_items(id) ON DELETE CASCADE,
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  url text DEFAULT '',
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  level integer DEFAULT 1,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE navigation_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read navigation items"
+  ON navigation_items FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage navigation items"
+  ON navigation_items FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update navigation items"
+  ON navigation_items FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete navigation items"
+  ON navigation_items FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- BANNERS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS banners (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  subtitle_ru text DEFAULT '',
+  subtitle_en text DEFAULT '',
+  subtitle_zh text DEFAULT '',
+  image_url text DEFAULT '',
+  button_text_ru text DEFAULT '',
+  button_text_en text DEFAULT '',
+  button_text_zh text DEFAULT '',
+  button_url text DEFAULT '',
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE banners ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read active banners"
+  ON banners FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage banners"
+  ON banners FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update banners"
+  ON banners FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete banners"
+  ON banners FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- SERVICE CATEGORIES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS service_categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  slug text UNIQUE NOT NULL,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE service_categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read service categories"
+  ON service_categories FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage service categories"
+  ON service_categories FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update service categories"
+  ON service_categories FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete service categories"
+  ON service_categories FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- SERVICES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS services (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_id uuid REFERENCES service_categories(id) ON DELETE SET NULL,
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  description_ru text DEFAULT '',
+  description_en text DEFAULT '',
+  description_zh text DEFAULT '',
+  full_description_ru text DEFAULT '',
+  image_url text DEFAULT '',
+  icon text DEFAULT '',
+  price_from integer,
+  price_currency text DEFAULT 'RUB',
+  slug text UNIQUE NOT NULL,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  is_featured boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read active services"
+  ON services FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage services"
+  ON services FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update services"
+  ON services FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete services"
+  ON services FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- PRODUCT CATEGORIES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS product_categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  slug text UNIQUE NOT NULL,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE product_categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read product categories"
+  ON product_categories FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage product categories"
+  ON product_categories FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update product categories"
+  ON product_categories FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete product categories"
+  ON product_categories FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- PRODUCTS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS products (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_id uuid REFERENCES product_categories(id) ON DELETE SET NULL,
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  description_ru text DEFAULT '',
+  description_en text DEFAULT '',
+  description_zh text DEFAULT '',
+  image_url text DEFAULT '',
+  price integer,
+  price_currency text DEFAULT 'RUB',
+  slug text UNIQUE NOT NULL,
+  brand text DEFAULT '',
+  model text DEFAULT '',
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  is_featured boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read active products"
+  ON products FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage products"
+  ON products FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update products"
+  ON products FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete products"
+  ON products FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- NEWS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS news (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_ru text NOT NULL,
+  title_en text DEFAULT '',
+  title_zh text DEFAULT '',
+  excerpt_ru text DEFAULT '',
+  excerpt_en text DEFAULT '',
+  content_ru text DEFAULT '',
+  content_en text DEFAULT '',
+  image_url text DEFAULT '',
+  slug text UNIQUE NOT NULL,
+  is_active boolean DEFAULT true,
+  is_featured boolean DEFAULT false,
+  published_at timestamptz DEFAULT now(),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE news ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read active news"
+  ON news FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage news"
+  ON news FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update news"
+  ON news FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete news"
+  ON news FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- CONTACTS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS contacts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  office_name_ru text NOT NULL,
+  office_name_en text DEFAULT '',
+  address_ru text DEFAULT '',
+  address_en text DEFAULT '',
+  phone text DEFAULT '',
+  email text DEFAULT '',
+  working_hours_ru text DEFAULT '',
+  map_lat numeric(10,7),
+  map_lng numeric(10,7),
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read contacts"
+  ON contacts FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage contacts"
+  ON contacts FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can update contacts"
+  ON contacts FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Authenticated users can delete contacts"
+  ON contacts FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- ============================================================
+-- SEED DATA
+-- ============================================================
+
+-- Site settings
+INSERT INTO site_settings (key, value, description) VALUES
+  ('logo_url', '', 'URL логотипа компании'),
+  ('logo_width', '160', 'Ширина логотипа в пикселях'),
+  ('phone_main', '+7 (495) 123-45-67', 'Основной номер телефона'),
+  ('phone_secondary', '8 (800) 555-12-34', 'Бесплатный номер'),
+  ('email_main', 'info@arshin-group.ru', 'Основной email'),
+  ('company_name', 'Аршин Групп', 'Название компании'),
+  ('company_tagline_ru', 'Маркировка. Сертификация. Честный знак.', 'Слоган компании (RU)'),
+  ('company_tagline_en', 'Marking. Certification. Honest Sign.', 'Слоган компании (EN)'),
+  ('company_tagline_zh', '标记。认证。诚实标志。', 'Слоган компании (ZH)'),
+  ('address_ru', 'г. Москва, ул. Примерная, д. 1, оф. 100', 'Адрес офиса'),
+  ('telegram', 'https://t.me/arshingroup', 'Telegram'),
+  ('whatsapp', '+79001234567', 'WhatsApp номер'),
+  ('footer_description_ru', 'Аршин Групп — ведущий поставщик услуг по маркировке товаров, сертификации и работе с системой Честный знак.', 'Описание в футере (RU)')
+ON CONFLICT (key) DO NOTHING;
+
+-- Navigation menus
+INSERT INTO navigation_menus (title_ru, title_en, title_zh, slug, sort_order) VALUES
+  ('О компании', 'About Us', '关于我们', 'about', 1),
+  ('Услуги', 'Services', '服务', 'services', 2),
+  ('Продукция', 'Products', '产品', 'products', 3),
+  ('Решения', 'Solutions', '解决方案', 'solutions', 4),
+  ('Новости', 'News', '新闻', 'news', 5),
+  ('Контакты', 'Contacts', '联系方式', 'contacts', 6)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Service categories
+INSERT INTO service_categories (title_ru, title_en, title_zh, slug, sort_order) VALUES
+  ('Маркировка товаров', 'Product Marking', '商品标记', 'marking', 1),
+  ('Сертификация', 'Certification', '认证', 'certification', 2),
+  ('Честный знак', 'Honest Sign', '诚实标志', 'honest-sign', 3),
+  ('Регистрация в системах', 'System Registration', '系统注册', 'registration', 4),
+  ('Консультации', 'Consulting', '咨询', 'consulting', 5)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Product categories
+INSERT INTO product_categories (title_ru, title_en, title_zh, slug, sort_order) VALUES
+  ('Принтеры этикеток', 'Label Printers', '标签打印机', 'label-printers', 1),
+  ('Сканеры штрихкодов', 'Barcode Scanners', '条形码扫描仪', 'barcode-scanners', 2),
+  ('Терминалы сбора данных', 'Data Collection Terminals', '数据采集终端', 'data-terminals', 3),
+  ('Расходные материалы', 'Consumables', '耗材', 'consumables', 4),
+  ('Программное обеспечение', 'Software', '软件', 'software', 5)
+ON CONFLICT (slug) DO NOTHING;
+*/

@@ -2,7 +2,7 @@
 
 namespace ArshinGroup.Domain.Models.Entities.Settings
 {
-    internal class NewsItem : BaseContentInfo
+    public class NewsItem : BaseContentInfo
     {
         public string ExcprtpRU {  get; set; }
         public string ExcprtpEN { get; set; }
