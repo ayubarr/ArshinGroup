@@ -12,5 +12,7 @@ namespace ArshinGroup.Domain.Models.Entities.Settings
 
         public int? ParrentId { get; set; }
         public NavigationItem? Parent {  get; set; }
+
+        public ICollection<NavigationItem>? Children { get; set; } = new List<NavigationItem>();
     }
 }

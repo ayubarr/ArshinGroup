@@ -6,6 +6,6 @@ namespace ArshinGroup.Domain.Models.Entities.Settings
     {
         public string Slug { get; set; }
 
-        public ICollection<NavigationItem>? Items { get; set; }
+        public ICollection<NavigationItem>? NavigationItems { get; set; }
     }
 }

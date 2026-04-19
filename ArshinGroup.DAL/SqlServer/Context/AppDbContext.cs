@@ -8,7 +8,6 @@ using ArshinGroup.Domain.Models.Entities.Users;
 using ArshinGroup.Domain.Models.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace ArshinGroup.DAL.SqlServer.Context
 {
@@ -46,19 +45,30 @@ namespace ArshinGroup.DAL.SqlServer.Context
         {
             base.OnModelCreating(builder);
 
-            //optionsBuilder
-            // .UseSqlServer("ваша-строка-подключения")
-            // .UseSnakeCaseNamingConvention();  
-
             builder
+                .ApplyConfigurationsFromAssembly(typeof(BannerConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ContactConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(NavigationItemConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(NavigationMenuConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(NewsItemConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ProductCategoryConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ProductConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ProductDeliveryMethodConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ProductImageConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ProductScpecConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ServiceCategoryConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ServiceEntityConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(ServiceFeatureConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(SettingConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(SolutionConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(SolutionFeatureConfiguration).Assembly)
+                .ApplyConfigurationsFromAssembly(typeof(SolutionProductConfiguration).Assembly)
                 .ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly)
                 ;
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
-            // Глобальное правило: все строки по умолчанию будут nvarchar(50) / varchar(50)
-            configurationBuilder.Properties<string>().HaveMaxLength(DefaultConstraints.DefaultLength);
             configurationBuilder.Properties<decimal>().HavePrecision(DefaultConstraints.DefaultMaxPrecision, DefaultConstraints.DefaultMaxPrecisionDecimalPoint);
             configurationBuilder.Properties<double>().HavePrecision(DefaultConstraints.DefaultMaxPrecision, DefaultConstraints.DefaultMaxPrecisionDecimalPoint);
         }
